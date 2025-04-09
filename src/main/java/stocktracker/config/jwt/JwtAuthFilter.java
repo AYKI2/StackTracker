@@ -13,7 +13,6 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import stocktracker.config.helper.CustomUserDetailsService;
-import stocktracker.exception.UnauthorizedException;
 
 import java.io.IOException;
 
@@ -44,7 +43,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         try {
             String type = jwtUtils.extractTokenType(jwt);
             if ("refresh".equals(type)) {
-                throw new UnauthorizedException("Refresh токен нельзя использовать как access");
+                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Refresh токен нельзя использовать как access");
+                return;
             }
 
             String username = jwtUtils.extractUsername(jwt);
@@ -59,9 +59,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             }
 
         } catch (ExpiredJwtException e) {
-            throw new UnauthorizedException("Срок действия токена истёк");
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Срок действия токена истёк");
+            return;
         } catch (MalformedJwtException e) {
-            throw new UnauthorizedException("Неверный токен");
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Неверный токен");
+            return;
         }
 
         filterChain.doFilter(request, response);
