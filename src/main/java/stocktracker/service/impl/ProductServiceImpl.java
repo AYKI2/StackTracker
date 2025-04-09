@@ -28,7 +28,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductResponse> getAllProducts() {
+    public List<ProductResponse> getAll() {
         logger.info("Получение всех Товаров");
         List<Product> products = productRepository.findAll();
         logger.info("Найдено {} Товаров", products.size());
@@ -44,7 +44,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponse getProductById(Long id) {
+    public ProductResponse getById(Long id) {
         logger.info("Поиск Товара с id: {}", id);
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> {
@@ -56,7 +56,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponse createProduct(ProductDTO request) {
+    public ProductResponse create(ProductDTO request) {
         logger.info("Создание нового Товара с именем: {}", request.name());
         Product product = productRepository.save(new Product(request.name(), Unit.valueOf(request.unit().toUpperCase()), LocalDateTime.now()));
         logger.info("Товар с id: {} успешно создан", product.getId());
@@ -64,7 +64,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponse updateProduct(Long id, ProductDTO request) {
+    public ProductResponse update(Long id, ProductDTO request) {
         logger.info("Обновление Товара с id: {}", id);
         Product product = productRepository.findById(id).orElseThrow(() -> {
             logger.error("Товар с id: {} не найден для обновления", id);
@@ -79,7 +79,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Transactional
     @Override
-    public ResponseEntity<String> deleteProduct(Long id) {
+    public ResponseEntity<String> delete(Long id) {
         logger.info("Удаление Товара с id: {}", id);
         productRepository.deleteById(id);
         logger.info("Товар с id: {} успешно удален", id);

@@ -7,9 +7,9 @@ import stocktracker.model.dto.response.ProductResponse;
 import java.util.List;
 
 public interface ProductService {
-    List<ProductResponse> getAllProducts();
-    ProductResponse getProductById(Long id);
-    ProductResponse createProduct(ProductDTO product);
-    ProductResponse updateProduct(Long id, ProductDTO product);
-    ResponseEntity<String> deleteProduct(Long id);
+    List<ProductResponse> getAll();
+    ProductResponse getById(Long id);
+    ProductResponse create(ProductDTO product);
+    ProductResponse update(Long id, ProductDTO product);
+    ResponseEntity<String> delete(Long id);
 }

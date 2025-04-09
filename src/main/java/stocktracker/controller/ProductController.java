@@ -26,7 +26,7 @@ public class ProductController {
             description = "Возвращает полную информацию о Товаре по её идентификатору."
     )
     public ResponseEntity<ProductResponse> getProductById(@PathVariable Long id) {
-        return ResponseEntity.ok(productService.getProductById(id));
+        return ResponseEntity.ok(productService.getById(id));
     }
 
     @GetMapping
@@ -35,7 +35,7 @@ public class ProductController {
             description = "Возвращает список Товаров с поддержкой пагинации."
     )
     public ResponseEntity<List<ProductResponse>> getAllProducts() {
-        return ResponseEntity.ok(productService.getAllProducts());
+        return ResponseEntity.ok(productService.getAll());
     }
 
     @PostMapping
@@ -44,7 +44,7 @@ public class ProductController {
             description = "Создает новый Товар с полученными данными и возвращает созданной товар."
     )
     public ResponseEntity<ProductResponse> create(@RequestBody ProductDTO productDTO){
-        return ResponseEntity.ok(productService.createProduct(productDTO));
+        return ResponseEntity.ok(productService.create(productDTO));
     }
 
     @PutMapping("/{id}")
@@ -53,7 +53,7 @@ public class ProductController {
             description = "Обновляет данные Товара."
     )
     public ResponseEntity<ProductResponse> update(@PathVariable Long id, @RequestBody ProductDTO productDTO){
-        return ResponseEntity.ok(productService.updateProduct(id, productDTO));
+        return ResponseEntity.ok(productService.update(id, productDTO));
     }
 
     @DeleteMapping("/{id}")
@@ -62,6 +62,6 @@ public class ProductController {
             description = "Удаляет товар с базы данных."
     )
     public ResponseEntity<String> delete(@PathVariable Long id){
-        return productService.deleteProduct(id);
+        return productService.delete(id);
     }
 }
