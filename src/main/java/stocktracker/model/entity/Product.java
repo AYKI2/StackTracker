@@ -49,4 +49,5 @@ public class Product {
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
+
 }

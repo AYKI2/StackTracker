@@ -19,6 +19,8 @@ public class StockMovement {
     private BigDecimal quantity;
     private BigDecimal pricePerUnit;
     private LocalDateTime createdAt;
+    @Column(name = "deleted")
+    private boolean deleted = false;
     @Enumerated(EnumType.STRING)
     private MovementType type;
     @ManyToOne(fetch = FetchType.LAZY)
@@ -86,5 +88,13 @@ public class StockMovement {
 
     public void setProduct(Product product) {
         this.product = product;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 }
