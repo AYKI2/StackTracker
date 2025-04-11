@@ -10,12 +10,14 @@ import java.time.LocalDateTime;
 public class ProductStock {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "product_stock_id_gen")
-    @SequenceGenerator(name = "product_stock_id_gen", sequenceName = "product_stock_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "product_stocks_id_gen")
+    @SequenceGenerator(name = "product_stocks_id_gen", sequenceName = "product_stocks_id_seq", allocationSize = 1)
     @Column(name = "id", nullable = false)
     private Long id;
     private BigDecimal totalQuantity;
     private BigDecimal lastPrice;
+    private Integer boxCount;
+    private BigDecimal totalValue; // totalQuantity * lastPrice
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
@@ -24,6 +26,15 @@ public class ProductStock {
     public ProductStock(BigDecimal totalQuantity, BigDecimal lastPrice, Product product, LocalDateTime createdAt) {
         this.totalQuantity = totalQuantity;
         this.lastPrice = lastPrice;
+        this.product = product;
+        this.createdAt = createdAt;
+    }
+
+    public ProductStock(BigDecimal totalQuantity, BigDecimal lastPrice, Integer boxCount, BigDecimal totalValue, Product product, LocalDateTime createdAt) {
+        this.totalQuantity = totalQuantity;
+        this.lastPrice = lastPrice;
+        this.boxCount = boxCount;
+        this.totalValue = totalValue;
         this.product = product;
         this.createdAt = createdAt;
     }
@@ -65,5 +76,21 @@ public class ProductStock {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public Integer getBoxCount() {
+        return boxCount;
+    }
+
+    public void setBoxCount(Integer boxCount) {
+        this.boxCount = boxCount;
+    }
+
+    public BigDecimal getTotalValue() {
+        return totalValue;
+    }
+
+    public void setTotalValue(BigDecimal totalValue) {
+        this.totalValue = totalValue;
     }
 }

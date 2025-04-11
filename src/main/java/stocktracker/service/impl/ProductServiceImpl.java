@@ -13,6 +13,7 @@ import stocktracker.model.enums.Unit;
 import stocktracker.repository.ProductRepository;
 import stocktracker.service.ProductService;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +39,9 @@ public class ProductServiceImpl implements ProductService {
             productResponses.add(new ProductResponse(
                     product.getId(),product.getName(),
                     product.getUnit().name(),
+                    product.getUnitPrice(),
+                    product.getBoxPrice(),
+                    product.getUnitsInBox(),
                     product.getCreatedAt()));
         }
         return productResponses;
@@ -52,29 +56,86 @@ public class ProductServiceImpl implements ProductService {
                     return new NotFoundException(String.format("Товар с id: %d не найден.", id));
                 });
         logger.info("Товар с id: {} найден", id);
-        return new ProductResponse(product.getId(), product.getName(), product.getUnit().name(), product.getCreatedAt());
+        return new ProductResponse(
+                product.getId(),product.getName(),
+                product.getUnit().name(),
+                product.getUnitPrice(),
+                product.getBoxPrice(),
+                product.getUnitsInBox(),
+                product.getCreatedAt());
     }
 
     @Override
     public ProductResponse create(ProductDTO request) {
-        logger.info("Создание нового Товара с именем: {}", request.name());
-        Product product = productRepository.save(new Product(request.name(), Unit.valueOf(request.unit().toUpperCase()), LocalDateTime.now()));
-        logger.info("Товар с id: {} успешно создан", product.getId());
-        return new ProductResponse(product.getId(), product.getName(), product.getUnit().name(), product.getCreatedAt());
+        logger.info("Создание нового Товара: {}", request.name());
+
+        BigDecimal pricePerUnit = request.pricePerUnit();
+        Integer unitsInBox = request.unitsInBox();
+        BigDecimal boxPrice = request.boxPrice();
+        boolean boxPriceManual = false;
+
+        if (boxPrice == null && pricePerUnit != null && unitsInBox != null) {
+            boxPrice = pricePerUnit.multiply(BigDecimal.valueOf(unitsInBox));
+        }else {
+            boxPriceManual = true;
+        }
+
+        Product product = new Product(
+                request.name(),
+                Unit.valueOf(request.unit().toUpperCase()),
+                unitsInBox,
+                pricePerUnit,
+                boxPrice,
+                boxPriceManual,
+                LocalDateTime.now()
+        );
+
+        productRepository.save(product);
+
+        return new ProductResponse(
+                product.getId(),
+                product.getName(),
+                product.getUnit().name(),
+                product.getUnitPrice(),
+                product.getBoxPrice(),
+                product.getUnitsInBox(),
+                product.getCreatedAt()
+        );
     }
 
     @Override
     public ProductResponse update(Long id, ProductDTO request) {
         logger.info("Обновление Товара с id: {}", id);
-        Product product = productRepository.findById(id).orElseThrow(() -> {
-            logger.error("Товар с id: {} не найден для обновления", id);
-            return new NotFoundException(String.format("Товар с id: %d не найден.", id));
-        });
+
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Товар не найден."));
+        boolean boxPriceManual = false;
+
         product.setName(request.name());
         product.setUnit(Unit.valueOf(request.unit().toUpperCase()));
-        Product updatedProduct = productRepository.save(product);
-        logger.info("Товар с id: {} успешно обновлён", updatedProduct.getId());
-        return new ProductResponse(updatedProduct.getId(), updatedProduct.getName(), updatedProduct.getUnit().name(), updatedProduct.getCreatedAt());
+        product.setUnitPrice(request.pricePerUnit());
+        product.setUnitsInBox(request.unitsInBox());
+
+        BigDecimal boxPrice = request.boxPrice();
+        if (boxPrice == null && request.pricePerUnit() != null && request.unitsInBox() != null) {
+            boxPrice = request.pricePerUnit().multiply(BigDecimal.valueOf(request.unitsInBox()));
+        }else {
+            boxPriceManual = true;
+        }
+        product.setBoxPriceManual(boxPriceManual);
+        product.setBoxPrice(boxPrice);
+
+        productRepository.save(product);
+
+        return new ProductResponse(
+                product.getId(),
+                product.getName(),
+                product.getUnit().name(),
+                product.getUnitPrice(),
+                product.getBoxPrice(),
+                product.getUnitsInBox(),
+                product.getCreatedAt()
+        );
     }
 
     @Transactional

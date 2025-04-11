@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import stocktracker.model.dto.response.StockResponse;
-import stocktracker.model.entity.ProductStock;
 import stocktracker.service.ProductStockService;
 
 import java.util.List;
@@ -24,7 +23,7 @@ public class ProductStockController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ProductStock>> getAllStocks() {
+    public ResponseEntity<List<StockResponse>> getAllStocks() {
         return ResponseEntity.ok(productStockService.getAll());
     }
 

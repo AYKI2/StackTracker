@@ -2,12 +2,15 @@ package stocktracker.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import stocktracker.model.dto.StockMovementDTO;
 import stocktracker.model.dto.response.StockMovementResponse;
+import stocktracker.model.enums.MovementType;
 import stocktracker.service.StockMovementService;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -65,4 +68,28 @@ public class StockMovementController {
     public ResponseEntity<String> delete(@PathVariable Long id){
         return stockMovementService.delete(id);
     }
+
+    @GetMapping("/filter")
+    @Operation(
+            summary = "Фильтрция движений товара.",
+            description = "Возвращает филтрованный список движений товара с базы данных."
+    )
+    public List<StockMovementResponse> filterMovements(
+            @RequestParam(required = false) Long productId,
+            @RequestParam(required = false) MovementType type,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate
+    ) {
+        return stockMovementService.filter(productId, type, startDate, endDate);
+    }
+
+    /*
+    Примеры вызова:
+    Все движения по продукту 5:
+    GET /api/stock/filter?productId=5
+
+    Все расходы за период:
+    GET /api/stock/filter?type=OUT&startDate=2025-04-01T00:00:00&endDate=2025-04-10T23:59:59
+     */
+
 }

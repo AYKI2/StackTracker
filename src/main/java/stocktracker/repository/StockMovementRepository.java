@@ -13,10 +13,18 @@ import java.util.List;
 @Repository
 public interface StockMovementRepository extends JpaRepository<StockMovement, Long> {
     @Query("""
-            SELECT m FROM StockMovement m 
-            WHERE (:productId IS NULL OR m.product.id = :productId) 
-            AND (:type IS NULL OR m.type = :type) 
-            AND (:fromDate IS NULL OR m.createdAt >= :fromDate) 
-            AND (:toDate IS NULL OR m.createdAt <= :toDate) AND m.deleted = false """)
-    List<StockMovement> filter(@Param("productId") Long productId, @Param("type") MovementType type, @Param("fromDate") LocalDateTime fromDate, @Param("toDate") LocalDateTime toDate );
+        SELECT sm FROM StockMovement sm
+        WHERE (:productId IS NULL OR sm.product.id = :productId)
+        AND (:type IS NULL OR sm.type = :type)
+        AND (:startDate IS NULL OR sm.createdAt >= :startDate)
+        AND (:endDate IS NULL OR sm.createdAt <= :endDate)
+        AND sm.deleted = false
+        ORDER BY sm.createdAt DESC
+    """)
+    List<StockMovement> filterMovements(
+            @Param("productId") Long productId,
+            @Param("type") MovementType type,
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate
+    );
 }

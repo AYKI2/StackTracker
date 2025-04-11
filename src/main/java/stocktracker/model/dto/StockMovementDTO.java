@@ -7,6 +7,8 @@ public record StockMovementDTO(
         String type,
         BigDecimal quantity,
         BigDecimal pricePerUnit,
-        String description
+        String description,
+        Integer boxCount,
+        Integer unitsPerBox
 ) {
 }

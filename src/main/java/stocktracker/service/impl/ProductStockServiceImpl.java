@@ -7,12 +7,14 @@ import stocktracker.exception.NotFoundException;
 import stocktracker.model.dto.response.StockResponse;
 import stocktracker.model.entity.Product;
 import stocktracker.model.entity.ProductStock;
+import stocktracker.model.enums.Unit;
 import stocktracker.repository.ProductRepository;
 import stocktracker.repository.ProductStockRepository;
 import stocktracker.service.ProductStockService;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -37,21 +39,26 @@ public class ProductStockServiceImpl implements ProductStockService {
                     newStock.setProduct(product);
                     newStock.setTotalQuantity(BigDecimal.ZERO);
                     newStock.setLastPrice(BigDecimal.ZERO);
+                    newStock.setBoxCount(0);
+                    newStock.setTotalValue(BigDecimal.ZERO);
                     newStock.setCreatedAt(LocalDateTime.now());
                     return productStockRepository.save(newStock);
                 });
     }
 
     @Override
-    public void increaseStock(Long productId, BigDecimal quantity, BigDecimal price) {
+    public void increaseStock(Long productId, BigDecimal quantity, BigDecimal price, Unit unit) {
         ProductStock stock = getOrCreateStock(productId);
         stock.setTotalQuantity(stock.getTotalQuantity().add(quantity));
         stock.setLastPrice(price);
+        if(unit == Unit.BOX) {
+            stock.setBoxCount(quantity.intValue());
+        }
         productStockRepository.save(stock);
     }
 
     @Override
-    public void decreaseStock(Long productId, BigDecimal quantity) {
+    public void decreaseStock(Long productId, BigDecimal quantity, Unit unit) {
         ProductStock stock = getOrCreateStock(productId);
         if (stock.getTotalQuantity().compareTo(quantity) < 0) {
             throw new IllegalArgumentException("Недостаточно товара на складе");
@@ -61,8 +68,19 @@ public class ProductStockServiceImpl implements ProductStockService {
     }
 
     @Override
-    public List<ProductStock> getAll() {
-        return productStockRepository.findAll();
+    public List<StockResponse> getAll() {
+        List<ProductStock> stocks = productStockRepository.findAll();
+        List<StockResponse> responses = new ArrayList<>();
+        for (ProductStock stock : stocks) {
+            responses.add(new StockResponse(
+                    stock.getId(),
+                    stock.getTotalQuantity(),
+                    stock.getLastPrice(),
+                    stock.getBoxCount(),
+                    stock.getTotalValue(),
+                    stock.getCreatedAt()));
+        }
+        return responses;
     }
 
     @Override
@@ -74,7 +92,13 @@ public class ProductStockServiceImpl implements ProductStockService {
     @Override
     public StockResponse getStock(Long productId) {
         ProductStock stock = getByProductId(productId);
-        return new StockResponse(stock.getId(), stock.getTotalQuantity(), stock.getLastPrice(), stock.getCreatedAt());
+        return new StockResponse(
+                stock.getId(),
+                stock.getTotalQuantity(),
+                stock.getLastPrice(),
+                stock.getBoxCount(),
+                stock.getTotalValue(),
+                stock.getCreatedAt());
     }
 
 }
