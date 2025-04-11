@@ -1,13 +1,14 @@
-FROM gradle:8.13.0-jdk21  AS dev
-
+# Dev stage
+FROM gradle:8.13.0-jdk21-alpine AS dev
 WORKDIR /app
 
-COPY build.gradle settings.gradle ./
-
+# Кэширование зависимостей Gradle
+COPY build.gradle settings.gradle gradle.properties ./
+COPY gradle gradle
 RUN gradle dependencies --no-daemon
 
-COPY src ./src
+# Копирование исходников
+COPY src src
 
-EXPOSE 8080
-
-ENTRYPOINT ["gradle", "bootRun", "--no-daemon", "-g", "/tmp/.gradle"]
+# Запуск в dev-режиме с hot-reload
+ENTRYPOINT ["gradle", "bootRun", "--no-daemon", "--continuous", "-PspringProfile=dev"]
