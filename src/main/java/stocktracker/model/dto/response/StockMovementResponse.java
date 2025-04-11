@@ -9,6 +9,7 @@ public record StockMovementResponse(
         String type,
         BigDecimal quantity,
         BigDecimal pricePerUnit,
+        BigDecimal totalPrice,
         String description,
         LocalDateTime createdAt
 ) {

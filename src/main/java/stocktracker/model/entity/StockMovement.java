@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
 public class StockMovement {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "stock_movement_id_gen")
-    @SequenceGenerator(name = "stock_movement_id_gen", sequenceName = "stock_movement_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "stock_movements_id_gen")
+    @SequenceGenerator(name = "stock_movements_id_gen", sequenceName = "stock_movements_id_seq", allocationSize = 1)
     @Column(name = "id", nullable = false)
     private Long id;
     private String description;
@@ -23,20 +23,30 @@ public class StockMovement {
     private boolean deleted = false;
     @Enumerated(EnumType.STRING)
     private MovementType type;
+    private Integer boxCount; // если поступает/расходуется коробками
+    private Integer unitsPerBox; // фиксируется на момент движения (могло измениться потом)
+    @Column(precision = 12, scale = 2)
+    private BigDecimal totalPrice; // pricePerUnit * quantity
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    public StockMovement(String description, BigDecimal quantity, BigDecimal pricePerUnit, MovementType type, Product product, LocalDateTime createdAt) {
+    public StockMovement() {}
+
+    public StockMovement(String description,
+                         BigDecimal quantity, BigDecimal price,
+                         BigDecimal totalPrice, MovementType movementType,
+                         Product product, LocalDateTime now, Integer boxCount, Integer unitsPerBox) {
         this.description = description;
         this.quantity = quantity;
-        this.pricePerUnit = pricePerUnit;
-        this.type = type;
+        this.pricePerUnit = price;
+        this.totalPrice = totalPrice;
+        this.type = movementType;
         this.product = product;
-        this.createdAt = createdAt;
+        this.createdAt = now;
+        this.boxCount = boxCount;
+        this.unitsPerBox = unitsPerBox;
     }
-
-    public StockMovement() {}
 
     public Long getId() {
         return id;
@@ -96,5 +106,37 @@ public class StockMovement {
 
     public void setDeleted(boolean deleted) {
         this.deleted = deleted;
+    }
+
+    public Integer getBoxCount() {
+        return boxCount;
+    }
+
+    public void setBoxCount(Integer boxCount) {
+        this.boxCount = boxCount;
+    }
+
+    public Integer getUnitsPerBox() {
+        return unitsPerBox;
+    }
+
+    public void setUnitsPerBox(Integer unitsPerBox) {
+        this.unitsPerBox = unitsPerBox;
+    }
+
+    public BigDecimal getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(BigDecimal totalPrice) {
+        this.totalPrice = totalPrice;
+    }
+
+    @PrePersist
+    @PreUpdate
+    private void calculateTotal() {
+        if (quantity != null && pricePerUnit != null) {
+            totalPrice = pricePerUnit.multiply(quantity);
+        }
     }
 }
