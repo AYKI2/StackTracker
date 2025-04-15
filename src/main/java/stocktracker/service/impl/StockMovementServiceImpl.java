@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import stocktracker.exception.NotFoundException;
 import stocktracker.model.dto.StockMovementDTO;
+import stocktracker.model.dto.response.CategoryResponse;
 import stocktracker.model.dto.response.ProductResponse;
 import stocktracker.model.dto.response.StockMovementResponse;
 import stocktracker.model.entity.Product;
@@ -53,6 +54,9 @@ public class StockMovementServiceImpl implements StockMovementService {
                             movement.getProduct().getUnitPrice(),
                             movement.getProduct().getBoxPrice(),
                             movement.getProduct().getUnitsInBox(),
+                            new CategoryResponse(
+                                    movement.getProduct().getId(),
+                                    movement.getProduct().getCategory().getName()),
                             movement.getProduct().getCreatedAt()
                     ),
                     movement.getType().name(),
@@ -83,6 +87,9 @@ public class StockMovementServiceImpl implements StockMovementService {
                         movement.getProduct().getUnitPrice(),
                         movement.getProduct().getBoxPrice(),
                         movement.getProduct().getUnitsInBox(),
+                        new CategoryResponse(
+                                movement.getProduct().getId(),
+                                movement.getProduct().getCategory().getName()),
                         movement.getProduct().getCreatedAt()
                 ),
                 movement.getType().name(),
@@ -139,6 +146,9 @@ public class StockMovementServiceImpl implements StockMovementService {
                         product.getUnitPrice(),
                         product.getBoxPrice(),
                         product.getUnitsInBox(),
+                        new CategoryResponse(
+                                movement.getProduct().getId(),
+                                movement.getProduct().getCategory().getName()),
                         product.getCreatedAt()
                 ),
                 movement.getType().name(),
@@ -224,6 +234,9 @@ public class StockMovementServiceImpl implements StockMovementService {
                         product.getUnitPrice(),
                         product.getBoxPrice(),
                         product.getUnitsInBox(),
+                        new CategoryResponse(
+                                product.getId(),
+                                product.getCategory().getName()),
                         product.getCreatedAt()
                 ),
                 oldMovement.getType().name(),
@@ -249,6 +262,10 @@ public class StockMovementServiceImpl implements StockMovementService {
                                 sm.getProduct().getUnitPrice(),
                                 sm.getProduct().getBoxPrice(),
                                 sm.getProduct().getUnitsInBox(),
+                                new CategoryResponse(
+                                        sm.getProduct().getId(),
+                                        sm.getProduct().getCategory().getName()
+                                ),
                                 sm.getProduct().getCreatedAt()
                         ),
                         sm.getType().name(),

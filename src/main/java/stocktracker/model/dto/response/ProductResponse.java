@@ -10,6 +10,7 @@ public record ProductResponse(
         BigDecimal pricePerUnit,
         BigDecimal boxPrice,
         Integer unitsInBox,
+        CategoryResponse categoryResponse,
         LocalDateTime createdAt
 ) {
 }

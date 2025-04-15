@@ -7,9 +7,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import stocktracker.exception.NotFoundException;
 import stocktracker.model.dto.ProductDTO;
+import stocktracker.model.dto.response.CategoryResponse;
 import stocktracker.model.dto.response.ProductResponse;
+import stocktracker.model.entity.Category;
 import stocktracker.model.entity.Product;
 import stocktracker.model.enums.Unit;
+import stocktracker.repository.CategoryRepository;
 import stocktracker.repository.ProductRepository;
 import stocktracker.service.ProductService;
 
@@ -23,9 +26,11 @@ public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
     private static final Logger logger = LoggerFactory.getLogger(ProductServiceImpl.class);
+    private final CategoryRepository categoryRepository;
 
-    public ProductServiceImpl(ProductRepository productRepository) {
+    public ProductServiceImpl(ProductRepository productRepository, CategoryRepository categoryRepository) {
         this.productRepository = productRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     @Override
@@ -42,6 +47,9 @@ public class ProductServiceImpl implements ProductService {
                     product.getUnitPrice(),
                     product.getBoxPrice(),
                     product.getUnitsInBox(),
+                    new CategoryResponse(
+                            product.getCategory().getId(),
+                            product.getCategory().getName()),
                     product.getCreatedAt()));
         }
         return productResponses;
@@ -62,6 +70,9 @@ public class ProductServiceImpl implements ProductService {
                 product.getUnitPrice(),
                 product.getBoxPrice(),
                 product.getUnitsInBox(),
+                new CategoryResponse(
+                        product.getCategory().getId(),
+                        product.getCategory().getName()),
                 product.getCreatedAt());
     }
 
@@ -80,6 +91,12 @@ public class ProductServiceImpl implements ProductService {
             boxPriceManual = true;
         }
 
+        Category category = categoryRepository.findByNameIgnoreCase(
+                request.categoryRequest().name())
+                .orElseThrow(() ->
+                        new NotFoundException(
+                                String.format("Категория с названием: %s не найдена!",request.categoryRequest().name())));
+
         Product product = new Product(
                 request.name(),
                 Unit.valueOf(request.unit().toUpperCase()),
@@ -87,8 +104,11 @@ public class ProductServiceImpl implements ProductService {
                 pricePerUnit,
                 boxPrice,
                 boxPriceManual,
+                category,
                 LocalDateTime.now()
         );
+
+        category.getProducts().add(product);
 
         productRepository.save(product);
 
@@ -99,6 +119,7 @@ public class ProductServiceImpl implements ProductService {
                 product.getUnitPrice(),
                 product.getBoxPrice(),
                 product.getUnitsInBox(),
+                new CategoryResponse(category.getId(), category.getName()),
                 product.getCreatedAt()
         );
     }
@@ -115,6 +136,7 @@ public class ProductServiceImpl implements ProductService {
         product.setUnit(Unit.valueOf(request.unit().toUpperCase()));
         product.setUnitPrice(request.pricePerUnit());
         product.setUnitsInBox(request.unitsInBox());
+        product.getCategory().setName(request.categoryRequest().name());
 
         BigDecimal boxPrice = request.boxPrice();
         if (boxPrice == null && request.pricePerUnit() != null && request.unitsInBox() != null) {
@@ -134,8 +156,10 @@ public class ProductServiceImpl implements ProductService {
                 product.getUnitPrice(),
                 product.getBoxPrice(),
                 product.getUnitsInBox(),
-                product.getCreatedAt()
-        );
+                new CategoryResponse(
+                        product.getCategory().getId(),
+                        product.getCategory().getName()),
+                product.getCreatedAt());
     }
 
     @Transactional
