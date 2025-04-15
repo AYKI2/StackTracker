@@ -1,5 +1,7 @@
 package stocktracker.model.dto;
 
+import stocktracker.model.dto.request.CategoryRequest;
+
 import java.math.BigDecimal;
 
 public record ProductDTO(
@@ -7,5 +9,6 @@ public record ProductDTO(
         String unit,
         BigDecimal pricePerUnit,
         BigDecimal boxPrice,
-        Integer unitsInBox
+        Integer unitsInBox,
+        CategoryRequest categoryRequest
 ) {}

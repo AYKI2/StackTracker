@@ -24,6 +24,9 @@ public class Product {
     @Column(precision = 10, scale = 2)
     private BigDecimal boxPrice; // цена за коробку
     private Boolean boxPriceManual = false; // указывает, вручную ли введена boxPrice
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private Category category;
     private LocalDateTime createdAt;
 
     public Product(String name, Unit unit, Integer unitsInBox, BigDecimal unitPrice, BigDecimal boxPrice, Boolean boxPriceManual, LocalDateTime createdAt) {
@@ -33,6 +36,17 @@ public class Product {
         this.unitPrice = unitPrice;
         this.boxPrice = boxPrice;
         this.boxPriceManual = boxPriceManual;
+        this.createdAt = createdAt;
+    }
+
+    public Product(String name, Unit unit, Integer unitsInBox, BigDecimal unitPrice, BigDecimal boxPrice, Boolean boxPriceManual, Category category, LocalDateTime createdAt) {
+        this.name = name;
+        this.unit = unit;
+        this.unitsInBox = unitsInBox;
+        this.unitPrice = unitPrice;
+        this.boxPrice = boxPrice;
+        this.boxPriceManual = boxPriceManual;
+        this.category = category;
         this.createdAt = createdAt;
     }
 
@@ -94,6 +108,14 @@ public class Product {
 
     public void setBoxPriceManual(Boolean boxPriceManual) {
         this.boxPriceManual = boxPriceManual;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
     }
 
     // Автоматический пересчёт (в сервисе)
