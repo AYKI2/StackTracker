@@ -21,14 +21,12 @@ services:
   backend:
     build:
       context: .
-      target: dev
     container_name: stock-backend
     ports:
       - "8080:8080"
     volumes:
       - ./src:/app/src
     environment:
-      SPRING_PROFILES_ACTIVE: dev
       DB_HOST: db
       DB_PORT: 5432
       DB_NAME: ${DB_NAME}
