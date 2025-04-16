@@ -14,7 +14,6 @@ CREATE TABLE IF NOT EXISTS products (
                           units_in_box INTEGER NOT NULL DEFAULT 0,
                           unit_price NUMERIC(19, 4) NOT NULL DEFAULT 0,
                           box_price NUMERIC(19, 4) NOT NULL DEFAULT 0,
-                          box_price_manual BOOLEAN NOT NULL DEFAULT FALSE,
                           created_at TIMESTAMP DEFAULT now()
 );
 
@@ -22,7 +21,7 @@ CREATE TABLE IF NOT EXISTS products (
 CREATE TABLE IF NOT EXISTS stock_movements (
                                  id BIGSERIAL PRIMARY KEY,
                                  description TEXT,
-                                 quantity NUMERIC(19, 4) NOT NULL,
+                                 total_quantity NUMERIC(19, 4) NOT NULL,
                                  price_per_unit NUMERIC(19, 4),
                                  created_at TIMESTAMP DEFAULT now(),
                                  type VARCHAR(50) NOT NULL,

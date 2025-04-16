@@ -11,7 +11,7 @@ public interface ProductStockService {
     List<StockResponse> getAll();
     ProductStock getByProductId(Long productId);
     ProductStock getOrCreateStock(Long productId);
-    void increaseStock(Long productId, BigDecimal quantity, BigDecimal price, Unit unit);
-    void decreaseStock(Long productId, BigDecimal quantity, Unit unit);
+    void increaseStock(Long productId, BigDecimal quantity, BigDecimal price, Unit unit, Integer boxCount);
+    void decreaseStock(Long productId, BigDecimal quantity, BigDecimal price, Unit unit, Integer boxCount);
     StockResponse getStock(Long productId);
 }

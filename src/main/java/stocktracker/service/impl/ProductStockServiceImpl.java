@@ -47,10 +47,11 @@ public class ProductStockServiceImpl implements ProductStockService {
     }
 
     @Override
-    public void increaseStock(Long productId, BigDecimal quantity, BigDecimal price, Unit unit) {
+    public void increaseStock(Long productId, BigDecimal quantity, BigDecimal price, Unit unit, Integer boxCount) {
         ProductStock stock = getOrCreateStock(productId);
         stock.setTotalQuantity(stock.getTotalQuantity().add(quantity));
         stock.setLastPrice(price);
+        stock.setBoxCount(boxCount);
         if(unit == Unit.BOX) {
             stock.setBoxCount(quantity.intValue());
         }
@@ -58,8 +59,12 @@ public class ProductStockServiceImpl implements ProductStockService {
     }
 
     @Override
-    public void decreaseStock(Long productId, BigDecimal quantity, Unit unit) {
+    public void decreaseStock(Long productId, BigDecimal quantity, BigDecimal price, Unit unit, Integer boxCount) {
         ProductStock stock = getOrCreateStock(productId);
+        stock.setBoxCount(stock.getBoxCount() - quantity.intValue());
+        stock.setTotalQuantity(stock.getTotalQuantity().subtract(quantity));
+        stock.setLastPrice(price);
+        stock.setBoxCount(boxCount);
         if (stock.getTotalQuantity().compareTo(quantity) < 0) {
             throw new IllegalArgumentException("Недостаточно товара на складе");
         }

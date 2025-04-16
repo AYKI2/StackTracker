@@ -60,10 +60,12 @@ public class StockMovementServiceImpl implements StockMovementService {
                             movement.getProduct().getCreatedAt()
                     ),
                     movement.getType().name(),
-                    movement.getQuantity(),
+                    movement.getTotalQuantity(),
                     movement.getPricePerUnit(),
                     movement.getTotalPrice(),
                     movement.getDescription(),
+                    movement.getBoxCount(),
+                    movement.getUnitsPerBox(),
                     movement.getCreatedAt())
             );
         }
@@ -93,10 +95,12 @@ public class StockMovementServiceImpl implements StockMovementService {
                         movement.getProduct().getCreatedAt()
                 ),
                 movement.getType().name(),
-                movement.getQuantity(),
+                movement.getTotalQuantity(),
                 movement.getPricePerUnit(),
                 movement.getTotalPrice(),
                 movement.getDescription(),
+                movement.getBoxCount(),
+                movement.getUnitsPerBox(),
                 movement.getCreatedAt()
         );
     }
@@ -107,7 +111,9 @@ public class StockMovementServiceImpl implements StockMovementService {
         Product product = productRepository.findById(request.productId())
                 .orElseThrow(() -> new NotFoundException("Товар не найден"));
 
-        BigDecimal quantity = request.quantity();
+        Integer unitsInBox = request.unitsPerBox() == null ? product.getUnitsInBox() : request.unitsPerBox();
+
+        BigDecimal quantity = BigDecimal.valueOf(unitsInBox.longValue() * request.boxCount().longValue());
         BigDecimal price = request.pricePerUnit(); // может быть null
 
         BigDecimal totalPrice = null;
@@ -115,13 +121,10 @@ public class StockMovementServiceImpl implements StockMovementService {
             if (price == null || price.compareTo(BigDecimal.ZERO) <= 0) {
                 throw new IllegalArgumentException("Цена обязательна для прихода");
             }
-            stockService.increaseStock(product.getId(), quantity, price, product.getUnit());
+            stockService.increaseStock(product.getId(), quantity, price, product.getUnit(), request.boxCount());
             totalPrice = quantity.multiply(price);
         } else if (MovementType.valueOf(request.type()) == MovementType.OUT) {
-            stockService.decreaseStock(product.getId(), quantity, product.getUnit());
-            if (price != null) {
-                throw new IllegalArgumentException("Нельзя указывать цену при расходе");
-            }
+            stockService.decreaseStock(product.getId(), quantity, price, product.getUnit(), request.boxCount());
         }
 
         StockMovement movement = new StockMovement(
@@ -133,7 +136,7 @@ public class StockMovementServiceImpl implements StockMovementService {
                 product,
                 LocalDateTime.now(),
                 request.boxCount(),
-                request.unitsPerBox()
+                unitsInBox
         );
 
         stockMovementRepository.save(movement);
@@ -152,10 +155,12 @@ public class StockMovementServiceImpl implements StockMovementService {
                         product.getCreatedAt()
                 ),
                 movement.getType().name(),
-                movement.getQuantity(),
+                movement.getTotalQuantity(),
                 movement.getPricePerUnit(),
                 movement.getTotalPrice(),
                 movement.getDescription(),
+                movement.getBoxCount(),
+                movement.getUnitsPerBox(),
                 movement.getCreatedAt()
         );
     }
@@ -169,10 +174,10 @@ public class StockMovementServiceImpl implements StockMovementService {
 
         // откатить изменение stock
         if (movement.getType() == MovementType.IN) {
-            stockService.decreaseStock(movement.getProduct().getId(), movement.getQuantity(), movement.getProduct().getUnit());
+            stockService.decreaseStock(movement.getProduct().getId(), movement.getTotalQuantity(), movement.getPricePerUnit(), movement.getProduct().getUnit(), movement.getBoxCount());
         } else if (movement.getType() == MovementType.OUT) {
             ProductStock stock = stockService.getByProductId(movement.getProduct().getId());
-            stockService.increaseStock( movement.getProduct().getId(), movement.getQuantity(), movement.getPricePerUnit() != null ? movement.getPricePerUnit() : stock.getLastPrice(), movement.getProduct().getUnit());
+            stockService.increaseStock( movement.getProduct().getId(), movement.getTotalQuantity(), movement.getPricePerUnit() != null ? movement.getPricePerUnit() : stock.getLastPrice(), movement.getProduct().getUnit(), movement.getBoxCount());
         }
 
         movement.setDeleted(true);
@@ -187,16 +192,18 @@ public class StockMovementServiceImpl implements StockMovementService {
                 .orElseThrow(() -> new NotFoundException("Операция не найдена"));
         // откат старого
         if (oldMovement.getType() == MovementType.IN) {
-            stockService.decreaseStock(oldMovement.getProduct().getId(), oldMovement.getQuantity(), oldMovement.getProduct().getUnit());
+            stockService.decreaseStock(oldMovement.getProduct().getId(), oldMovement.getTotalQuantity(), oldMovement.getPricePerUnit(), oldMovement.getProduct().getUnit(), oldMovement.getBoxCount());
         } else {
-            stockService.increaseStock(oldMovement.getProduct().getId(), oldMovement.getQuantity(), oldMovement.getPricePerUnit(), oldMovement.getProduct().getUnit());
+            stockService.increaseStock(oldMovement.getProduct().getId(), oldMovement.getTotalQuantity(), oldMovement.getPricePerUnit(), oldMovement.getProduct().getUnit(), oldMovement.getBoxCount());
         }
 
         // применим новый
         Product product = productRepository.findById(request.productId())
                 .orElseThrow(() -> new NotFoundException("Товар не найден"));
 
-        BigDecimal quantity = request.quantity();
+        Integer unitsInBox = request.unitsPerBox() == null ? product.getUnitsInBox() : request.unitsPerBox();
+
+        BigDecimal quantity = BigDecimal.valueOf(unitsInBox.longValue() * request.boxCount().longValue());
         BigDecimal price = request.pricePerUnit();
 
         MovementType newType = MovementType.valueOf(request.type().toUpperCase());
@@ -205,21 +212,21 @@ public class StockMovementServiceImpl implements StockMovementService {
             if (price == null || price.compareTo(BigDecimal.ZERO) <= 0) {
                 throw new IllegalArgumentException("Цена обязательна при приходе");
             }
-            stockService.increaseStock(product.getId(), quantity, price, product.getUnit());
+            stockService.increaseStock(product.getId(), quantity, price, product.getUnit(), request.boxCount());
         } else {
-            stockService.decreaseStock(product.getId(), quantity, product.getUnit());
+            stockService.decreaseStock(product.getId(), quantity, price,product.getUnit(), request.boxCount());
         }
 
         oldMovement.setType(newType);
         oldMovement.setProduct(product);
-        oldMovement.setQuantity(quantity);
+        oldMovement.setTotalQuantity(quantity);
         oldMovement.setPricePerUnit(price);
         oldMovement.setDescription(request.description());
         oldMovement.setCreatedAt(LocalDateTime.now());
         oldMovement.setBoxCount(request.boxCount());
-        oldMovement.setUnitsPerBox(request.unitsPerBox());
+        oldMovement.setUnitsPerBox(unitsInBox);
 
-        if (newType == MovementType.IN && price != null && quantity != null) {
+        if (newType == MovementType.IN) {
             oldMovement.setTotalPrice(quantity.multiply(price));
         } else {
             oldMovement.setTotalPrice(null);
@@ -240,17 +247,19 @@ public class StockMovementServiceImpl implements StockMovementService {
                         product.getCreatedAt()
                 ),
                 oldMovement.getType().name(),
-                oldMovement.getQuantity(),
+                oldMovement.getTotalQuantity(),
                 oldMovement.getPricePerUnit(),
                 oldMovement.getTotalPrice(),
                 oldMovement.getDescription(),
+                oldMovement.getBoxCount(),
+                oldMovement.getUnitsPerBox(),
                 oldMovement.getCreatedAt()
         );
     }
 
     @Override
     public List<StockMovementResponse> filter(Long productId, MovementType type, LocalDateTime startDate, LocalDateTime endDate) {
-        List<StockMovement> movements = stockMovementRepository.filterMovements(productId, type, startDate, endDate);
+        List<StockMovement> movements = stockMovementRepository.filterMovements(productId, type.name(), startDate, endDate);
 
         return movements.stream()
                 .map(sm -> new StockMovementResponse(
@@ -269,10 +278,12 @@ public class StockMovementServiceImpl implements StockMovementService {
                                 sm.getProduct().getCreatedAt()
                         ),
                         sm.getType().name(),
-                        sm.getQuantity(),
+                        sm.getTotalQuantity(),
                         sm.getPricePerUnit(),
                         sm.getTotalPrice(),
                         sm.getDescription(),
+                        sm.getBoxCount(),
+                        sm.getUnitsPerBox(),
                         sm.getCreatedAt()
                 ))
                 .toList();

@@ -8,7 +8,6 @@ public record ProductDTO(
         String name,
         String unit,
         BigDecimal pricePerUnit,
-        BigDecimal boxPrice,
         Integer unitsInBox,
         CategoryRequest categoryRequest
 ) {}

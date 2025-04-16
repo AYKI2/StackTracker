@@ -16,7 +16,7 @@ public class StockMovement {
     @Column(name = "id", nullable = false)
     private Long id;
     private String description;
-    private BigDecimal quantity;
+    private BigDecimal totalQuantity;
     private BigDecimal pricePerUnit;
     private LocalDateTime createdAt;
     @Column(name = "deleted")
@@ -34,11 +34,11 @@ public class StockMovement {
     public StockMovement() {}
 
     public StockMovement(String description,
-                         BigDecimal quantity, BigDecimal price,
+                         BigDecimal totalQuantity, BigDecimal price,
                          BigDecimal totalPrice, MovementType movementType,
                          Product product, LocalDateTime now, Integer boxCount, Integer unitsPerBox) {
         this.description = description;
-        this.quantity = quantity;
+        this.totalQuantity = totalQuantity;
         this.pricePerUnit = price;
         this.totalPrice = totalPrice;
         this.type = movementType;
@@ -60,12 +60,12 @@ public class StockMovement {
         this.description = description;
     }
 
-    public BigDecimal getQuantity() {
-        return quantity;
+    public BigDecimal getTotalQuantity() {
+        return totalQuantity;
     }
 
-    public void setQuantity(BigDecimal quantity) {
-        this.quantity = quantity;
+    public void setTotalQuantity(BigDecimal quantity) {
+        this.totalQuantity = quantity;
     }
 
     public BigDecimal getPricePerUnit() {
@@ -135,8 +135,8 @@ public class StockMovement {
     @PrePersist
     @PreUpdate
     private void calculateTotal() {
-        if (quantity != null && pricePerUnit != null) {
-            totalPrice = pricePerUnit.multiply(quantity);
+        if (totalQuantity != null && pricePerUnit != null) {
+            totalPrice = pricePerUnit.multiply(totalQuantity);
         }
     }
 }

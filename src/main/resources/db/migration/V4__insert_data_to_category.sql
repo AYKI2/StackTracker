@@ -9,5 +9,9 @@ VALUES
     (7, 'Овощи и фрукты'),
     (8,'Продукты питания');
 
-
 SELECT setval('categories_id_seq', 8, true);
+
+
+UPDATE products SET category_id = 8 WHERE name IN ('Сахар', 'Мука', 'Масло подсолнечное', 'Соль', 'Макароны', 'Гречка');
+UPDATE products SET category_id = 1 WHERE name IN ('Чай черный', 'Кофе растворимый');
+UPDATE products SET category_id = 2 WHERE name IN ('Молоко', 'Йогурт');

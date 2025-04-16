@@ -7,10 +7,12 @@ public record StockMovementResponse(
         Long id,
         ProductResponse product,
         String type,
-        BigDecimal quantity,
+        BigDecimal totalQuantity,
         BigDecimal pricePerUnit,
         BigDecimal totalPrice,
         String description,
+        Integer boxCount,
+        Integer unitsInBox,
         LocalDateTime createdAt
 ) {
 }
