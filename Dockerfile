@@ -9,7 +9,7 @@ COPY . .
 RUN chmod +x gradlew
 
 #RUN gradle dependencies --no-daemon
-RUN ./gradle build -x test
+RUN ./gradlew build -x test
 
 # Копирование исходников
 #COPY src src
