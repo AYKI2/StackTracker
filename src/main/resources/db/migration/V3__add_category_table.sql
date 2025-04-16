@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS categories (
                             name VARCHAR(255) NOT NULL UNIQUE
 );
 
-ALTER TABLE products ADD COLUMN category_id BIGINT;
+ALTER TABLE products ADD COLUMN IF NOT EXISTS category_id BIGINT;
 
 ALTER TABLE products
     ADD CONSTRAINT fk_product_category

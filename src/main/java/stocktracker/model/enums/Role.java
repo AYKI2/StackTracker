@@ -1,5 +1,6 @@
 package stocktracker.model.enums;
 
 public enum Role {
-    ADMIN
+    ADMIN,
+    DELIVERY
 }

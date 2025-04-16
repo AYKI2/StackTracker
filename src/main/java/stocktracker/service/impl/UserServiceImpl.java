@@ -81,7 +81,7 @@ public class UserServiceImpl implements UserService {
 
         User user = new User(request.username(),
                 passwordEncoder.encode(request.password()),
-                Role.ADMIN);
+                Role.DELIVERY);
         userRepository.save(user);
 
         logger.info("Пользователь {} успешно зарегистрирован!", request.username());

@@ -26,7 +26,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryResponse create(CategoryRequest request) {
         if (categoryRepository.existsByNameIgnoreCase(request.name())) {
-            throw new IllegalArgumentException("Категория уже существует");
+            throw new IllegalArgumentException("Такая Категория уже существует");
         }
         Category category = categoryRepository.save(new Category(request.name()));
         return new CategoryResponse(category.getId(), category.getName());
@@ -44,14 +44,14 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryResponse findById(Long id) {
         Category category = categoryRepository.findById(id).orElseThrow(() ->
-                new NotFoundException(String.format("Категория с id: %d не найден!", id)));
+                new NotFoundException(String.format("Категория с id: %d не найдена!", id)));
         return new CategoryResponse(category.getId(), category.getName());
     }
 
     @Override
     public CategoryResponse update(Long id, CategoryRequest request) {
         Category category = categoryRepository.findById(id).orElseThrow(() ->
-                new NotFoundException(String.format("Категория с id: %d не найден!", id)));
+                new NotFoundException(String.format("Категория с id: %d не найдена!", id)));
         category.setName(request.name());
         return new CategoryResponse(category.getId(), category.getName());
     }

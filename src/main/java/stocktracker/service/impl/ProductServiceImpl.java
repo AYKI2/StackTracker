@@ -82,13 +82,10 @@ public class ProductServiceImpl implements ProductService {
 
         BigDecimal pricePerUnit = request.pricePerUnit();
         Integer unitsInBox = request.unitsInBox();
-        BigDecimal boxPrice = request.boxPrice();
-        boolean boxPriceManual = false;
+        BigDecimal boxPrice = BigDecimal.ZERO;
 
-        if (boxPrice == null && pricePerUnit != null && unitsInBox != null) {
+        if (pricePerUnit != null && unitsInBox != null) {
             boxPrice = pricePerUnit.multiply(BigDecimal.valueOf(unitsInBox));
-        }else {
-            boxPriceManual = true;
         }
 
         Category category = categoryRepository.findByNameIgnoreCase(
@@ -103,7 +100,6 @@ public class ProductServiceImpl implements ProductService {
                 unitsInBox,
                 pricePerUnit,
                 boxPrice,
-                boxPriceManual,
                 category,
                 LocalDateTime.now()
         );
@@ -130,7 +126,6 @@ public class ProductServiceImpl implements ProductService {
 
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Товар не найден."));
-        boolean boxPriceManual = false;
 
         product.setName(request.name());
         product.setUnit(Unit.valueOf(request.unit().toUpperCase()));
@@ -138,13 +133,10 @@ public class ProductServiceImpl implements ProductService {
         product.setUnitsInBox(request.unitsInBox());
         product.getCategory().setName(request.categoryRequest().name());
 
-        BigDecimal boxPrice = request.boxPrice();
-        if (boxPrice == null && request.pricePerUnit() != null && request.unitsInBox() != null) {
+        BigDecimal boxPrice = BigDecimal.ZERO;
+        if (request.pricePerUnit() != null && request.unitsInBox() != null) {
             boxPrice = request.pricePerUnit().multiply(BigDecimal.valueOf(request.unitsInBox()));
-        }else {
-            boxPriceManual = true;
         }
-        product.setBoxPriceManual(boxPriceManual);
         product.setBoxPrice(boxPrice);
 
         productRepository.save(product);

@@ -23,29 +23,26 @@ public class Product {
     private BigDecimal unitPrice; // цена за штуку
     @Column(precision = 10, scale = 2)
     private BigDecimal boxPrice; // цена за коробку
-    private Boolean boxPriceManual = false; // указывает, вручную ли введена boxPrice
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
     private LocalDateTime createdAt;
 
-    public Product(String name, Unit unit, Integer unitsInBox, BigDecimal unitPrice, BigDecimal boxPrice, Boolean boxPriceManual, LocalDateTime createdAt) {
+    public Product(String name, Unit unit, Integer unitsInBox, BigDecimal unitPrice, BigDecimal boxPrice, LocalDateTime createdAt) {
         this.name = name;
         this.unit = unit;
         this.unitsInBox = unitsInBox;
         this.unitPrice = unitPrice;
         this.boxPrice = boxPrice;
-        this.boxPriceManual = boxPriceManual;
         this.createdAt = createdAt;
     }
 
-    public Product(String name, Unit unit, Integer unitsInBox, BigDecimal unitPrice, BigDecimal boxPrice, Boolean boxPriceManual, Category category, LocalDateTime createdAt) {
+    public Product(String name, Unit unit, Integer unitsInBox, BigDecimal unitPrice, BigDecimal boxPrice, Category category, LocalDateTime createdAt) {
         this.name = name;
         this.unit = unit;
         this.unitsInBox = unitsInBox;
         this.unitPrice = unitPrice;
         this.boxPrice = boxPrice;
-        this.boxPriceManual = boxPriceManual;
         this.category = category;
         this.createdAt = createdAt;
     }
@@ -102,14 +99,6 @@ public class Product {
         this.boxPrice = boxPrice;
     }
 
-    public Boolean getBoxPriceManual() {
-        return boxPriceManual;
-    }
-
-    public void setBoxPriceManual(Boolean boxPriceManual) {
-        this.boxPriceManual = boxPriceManual;
-    }
-
     public Category getCategory() {
         return category;
     }
@@ -122,7 +111,7 @@ public class Product {
     @PrePersist
     @PreUpdate
     private void calculateBoxPriceIfNotManual() {
-        if (Boolean.FALSE.equals(boxPriceManual) && unitPrice != null && unitsInBox != null) {
+        if (unitPrice != null && unitsInBox != null) {
             boxPrice = unitPrice.multiply(BigDecimal.valueOf(unitsInBox));
         }
     }
