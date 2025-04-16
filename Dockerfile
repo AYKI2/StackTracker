@@ -24,6 +24,10 @@ RUN ./gradlew clean build -x test
 
 EXPOSE 8080
 
+ENV DB_URL=postgres://ueg19uj1f8p2s8:p3ecb36034daad1fdda1048a42186c347863c7d1f4b41237e69e4b5f301a2f542@cc0gj7hsrh0ht8.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com:5432/d3g0ovp149kql1
+ENV DB_USERNAME=ueg19uj1f8p2s8
+ENV DB_PASSWORD=p3ecb36034daad1fdda1048a42186c347863c7d1f4b41237e69e4b5f301a2f542
+
 CMD ["sh", "-c", "java -Dserver.port=$PORT -Xmx300m -Xss512k -XX:CICompilerCount=2 -Dfile.encoding=UTF-8 -XX:+UseContainerSupport -Djava.security.egd=file:/dev/./urandom -jar build/libs/*.jar"]
 
 
