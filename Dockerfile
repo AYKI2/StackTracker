@@ -3,10 +3,8 @@ FROM gradle:8.13.0-jdk21-alpine AS dev
 WORKDIR /app
 
 # Кэширование зависимостей Gradle
-#COPY build.gradle settings.gradle gradle.properties ./
+COPY build.gradle settings.gradle gradle.properties ./
 COPY . .
-ARG JAR_FILE=build/libs/StockTracker-0.0.1-SNAPSHOT.jar
-COPY ${JAR_FILE} app.jar
 
 RUN chmod +x gradlew
 
