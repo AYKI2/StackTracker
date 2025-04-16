@@ -1,12 +1,22 @@
-# Prod stage — простой образ для Heroku
-FROM eclipse-temurin:21-jdk-alpine
-ARG JAR_FILE=build/libs/StockTracker-0.0.1-SNAPSHOT.jar
-
-# рабочая директория
+# Dev stage
+FROM gradle:8.13.0-jdk21-alpine AS dev
 WORKDIR /app
 
-# копируем jar
-COPY ${JAR_FILE} app.jar
+# Кэширование зависимостей Gradle
+#COPY build.gradle settings.gradle gradle.properties ./
+COPY . .
 
-# Heroku предоставляет порт через переменную $PORT
-ENTRYPOINT ["java", "-Dserver.port=$PORT", "-jar", "app.jar"]
+RUN chmod +x gradlew
+
+#RUN gradle dependencies --no-daemon
+RUN ./gradlew build -x test
+
+# Копирование исходников
+#COPY src src
+
+# Запуск в dev-режиме с hot-reload
+#ENTRYPOINT ["gradle", "bootRun", "--no-daemon", "--continuous", "-PspringProfile=dev"]
+
+EXPOSE 8080
+
+CMD ["java","-jar"б "-Dserver.port=$PORT", "build/libs/StockTracker-0.0.1-SNAPSHOT.jar" , "app.jar"]
