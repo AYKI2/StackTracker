@@ -1,0 +1,12 @@
+# Prod stage — простой образ для Heroku
+FROM eclipse-temurin:21-jdk-alpine
+ARG JAR_FILE=build/libs/StockTracker-0.0.1-SNAPSHOT.jar
+
+# рабочая директория
+WORKDIR /app
+
+# копируем jar
+COPY ${JAR_FILE} app.jar
+
+# Heroku предоставляет порт через переменную $PORT
+ENTRYPOINT ["java", "-Dserver.port=$PORT", "-jar", "app.jar"]
