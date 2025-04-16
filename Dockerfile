@@ -19,6 +19,6 @@ RUN ./gradlew build -x test
 
 EXPOSE 8080
 
-CMD ["java","-jar"б "-Dserver.port=$PORT", "build/libs/StockTracker-0.0.1-SNAPSHOT.jar" , "app.jar"]
+CMD ["java","-jar", "-Dserver.port=$PORT", "build/libs/StockTracker-0.0.1-SNAPSHOT.jar" , "app.jar"]
 
 
