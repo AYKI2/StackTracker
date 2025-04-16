@@ -5,6 +5,9 @@ WORKDIR /app
 # Кэширование зависимостей Gradle
 #COPY build.gradle settings.gradle gradle.properties ./
 COPY . .
+
+RUN chmod +x gradlew
+
 #RUN gradle dependencies --no-daemon
 RUN ./gradle build -x test
 
