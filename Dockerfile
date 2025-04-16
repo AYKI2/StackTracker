@@ -17,7 +17,12 @@ FROM eclipse-temurin:21-jdk-alpine
 WORKDIR /app
 
 COPY ./build/libs/StockTracker-0.0.1-SNAPSHOT.jar app.jar
+COPY build.gradle settings.gradle gradle.properties ./
+COPY gradle gradle
+RUN gradle dependencies --no-daemon
 
+# Копирование исходников
+COPY src src
 
 EXPOSE 8080
 
