@@ -1,14 +1,11 @@
-# Dev stage
-FROM gradle:8.13.0-jdk21-alpine AS dev
+FROM amazoncorretto:21 AS builder
 WORKDIR /app
+COPY . .
+ENV PORT 9090
+RUN chmod +x ./gradlew && ./gradlew bootJar
 
-# Кэширование зависимостей Gradle
-COPY build.gradle settings.gradle gradle.properties ./
-COPY gradle gradle
-RUN gradle dependencies --no-daemon
-
-# Копирование исходников
-COPY src src
-
-# Запуск в dev-режиме с hot-reload
-ENTRYPOINT ["gradle", "bootRun", "--no-daemon", "--continuous", "-PspringProfile=dev"]
+FROM amazoncorretto:21-alpine
+WORKDIR /app
+COPY --from=builder /app/build/libs/StockTracker-0.0.1-SNAPSHOT.jar app.jar
+EXPOSE 9090
+ENTRYPOINT ["java", "-jar", "app.jar"]
