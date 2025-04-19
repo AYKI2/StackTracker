@@ -23,7 +23,7 @@ services:
       context: .
     container_name: stock-backend
     ports:
-      - "8080:8080"
+      - "9090:9090"
     volumes:
       - ./src:/app/src
     environment:
