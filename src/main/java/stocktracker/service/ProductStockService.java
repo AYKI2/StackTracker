@@ -9,8 +9,8 @@ import java.util.List;
 
 public interface ProductStockService {
     List<StockResponse> getAll();
-    ProductStock getByProductId(Long productId);
     ProductStock getOrCreateStock(Long productId);
+    void recalculateStock(Long productId);
     void increaseStock(Long productId, BigDecimal quantity, BigDecimal price, Unit unit, Integer boxCount);
     void decreaseStock(Long productId, BigDecimal quantity, BigDecimal price, Unit unit, Integer boxCount);
     StockResponse getStock(Long productId);

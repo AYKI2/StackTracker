@@ -27,4 +27,7 @@ public interface StockMovementRepository extends JpaRepository<StockMovement, Lo
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate
     );
+
+    @Query("SELECT sm FROM StockMovement sm WHERE sm.product.id = :productId AND sm.deleted = false")
+    List<StockMovement> findByProductIdAndDeletedFalse(@Param("productId")Long productId);
 }

@@ -18,7 +18,7 @@ public class Category {
     @Column(nullable = false, unique = true)
     private String name;
 
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "category", cascade = CascadeType.PERSIST)
     private List<Product> products = new ArrayList<>();
 
     public Category(String name, List<Product> products) {

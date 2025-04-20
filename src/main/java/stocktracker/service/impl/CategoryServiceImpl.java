@@ -64,4 +64,10 @@ public class CategoryServiceImpl implements CategoryService {
         categoryRepository.deleteById(id);
         return new ResponseEntity<>(String.format("Категория с id: %d успешно удален!",id), HttpStatus.OK);
     }
+
+    @Override
+    public Category findByName(String name) {
+        return categoryRepository.findByNameIgnoreCase(name).orElseThrow(() ->
+                new NotFoundException(String.format("Категория с наименованием: %s не найдена!", name)));
+    }
 }
