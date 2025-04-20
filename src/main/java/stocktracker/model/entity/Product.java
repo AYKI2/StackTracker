@@ -5,6 +5,8 @@ import stocktracker.model.enums.Unit;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "products")
@@ -26,6 +28,10 @@ public class Product {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductStock> productStocks = new ArrayList<>();
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<StockMovement> stockMovements = new ArrayList<>();
     private LocalDateTime createdAt;
 
     public Product(String name, Unit unit, Integer unitsInBox, BigDecimal unitPrice, BigDecimal boxPrice, LocalDateTime createdAt) {
@@ -105,6 +111,22 @@ public class Product {
 
     public void setCategory(Category category) {
         this.category = category;
+    }
+
+    public List<ProductStock> getProductStocks() {
+        return productStocks;
+    }
+
+    public void setProductStocks(List<ProductStock> productStocks) {
+        this.productStocks = productStocks;
+    }
+
+    public List<StockMovement> getStockMovements() {
+        return stockMovements;
+    }
+
+    public void setStockMovements(List<StockMovement> stockMovements) {
+        this.stockMovements = stockMovements;
     }
 
     // Автоматический пересчёт (в сервисе)

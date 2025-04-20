@@ -11,6 +11,7 @@ public record ProductResponse(
         BigDecimal boxPrice,
         Integer unitsInBox,
         CategoryResponse categoryResponse,
+        StockResponse stockResponse,
         LocalDateTime createdAt
 ) {
 }
