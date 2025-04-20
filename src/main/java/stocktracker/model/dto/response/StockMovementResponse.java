@@ -13,6 +13,7 @@ public record StockMovementResponse(
         String description,
         Integer boxCount,
         Integer unitsInBox,
+        boolean deleted,
         LocalDateTime createdAt
 ) {
 }

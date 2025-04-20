@@ -106,13 +106,16 @@ public class StockMovementServiceImpl implements StockMovementService {
         StockMovement movement = stockMovementRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Передвижение не найдено"));
 
-        rollbackStockMovement(movement);
-
+        // Просто помечаем как удалённое
         movement.setDeleted(true);
         stockMovementRepository.save(movement);
 
-        return ResponseEntity.ok("Удалено и откат выполнен");
+        // Пересчитываем склад по всем не удалённым движениям
+        stockService.recalculateStock(movement.getProduct().getId());
+
+        return ResponseEntity.ok("Движение удалено, склад пересчитан");
     }
+
 
     @Transactional
     @Override
@@ -187,6 +190,7 @@ public class StockMovementServiceImpl implements StockMovementService {
                 movement.getDescription(),
                 movement.getBoxCount(),
                 movement.getUnitsPerBox(),
+                movement.isDeleted(),
                 movement.getCreatedAt()
         );
     }
@@ -198,11 +202,17 @@ public class StockMovementServiceImpl implements StockMovementService {
         Unit unit = product.getUnit();
         int boxCount = movement.getBoxCount();
 
+        ProductStock stock = stockService.getOrCreateStock(product.getId());
+
         if (movement.getType() == MovementType.IN) {
+            if (stock.getTotalQuantity().compareTo(quantity) < 0) {
+                throw new IllegalStateException("Невозможно удалить: на складе недостаточно товара для отката");
+            }
             stockService.decreaseStock(product.getId(), quantity, price, unit, boxCount);
         } else {
-            BigDecimal rollbackPrice = price != null ? price : stockService.getOrCreateStock(product.getId()).getLastPrice();
+            BigDecimal rollbackPrice = price != null ? price : stock.getLastPrice();
             stockService.increaseStock(product.getId(), quantity, rollbackPrice, unit, boxCount);
         }
     }
+
 }
