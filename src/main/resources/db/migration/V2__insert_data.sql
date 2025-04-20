@@ -36,8 +36,8 @@ FOR p IN SELECT * FROM products LOOP
              nextval('stock_movements_id_seq'),
              'Первоначальный приход для ' || p.name,
              p.unit_price, 'IN', p.id,
-             6, p.units_in_box,
-             p.unit_price * p.units_in_box, p.units_in_box * 6, now(), false
+             20, p.units_in_box,
+             p.unit_price * p.units_in_box, p.units_in_box * 20, now(), false
              );
 
 INSERT INTO product_stocks (
@@ -48,7 +48,7 @@ INSERT INTO product_stocks (
              p.units_in_box * 20,
              p.unit_price,
              p.id,
-             20 / p.units_in_box,
+             20,
              p.unit_price * p.units_in_box, now()
          );
 END LOOP;
