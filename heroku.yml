@@ -2,4 +2,4 @@ build:
   docker:
     web: Dockerfile
 run:
-  web: java -jar /app/target/your-app.jar
+  web: java -jar /app/target/StockTracker-0.0.1-SNAPSHOT.jar
