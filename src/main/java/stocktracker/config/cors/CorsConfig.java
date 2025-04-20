@@ -17,7 +17,7 @@ public class CorsConfig {
                 "http://localhost:5173",
                 "http://localhost:5174",
                 "http://localhost:3000",
-                "https://market-system.netlify.app",
+                "https://peaceful-lily-a38503.netlify.app",
                 "https://*.ngrok-free.app" //
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
